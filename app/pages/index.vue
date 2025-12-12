@@ -45,7 +45,7 @@ import { useJournalEntries } from '#imports'
 
 const { getTodayJournalCount } = useJournalEntries()
 const todayCount = ref(0)
-const activeTab = ref('entries') // 'entries' or 'form'
+const activeTab = ref('form') // 'entries' or 'form'
 
 // Fetch today's entries count
 onMounted(async () => {

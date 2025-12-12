@@ -2,12 +2,12 @@
   <div class="mx-auto">
     <div class="space-y-6">
       <!-- Date Input -->
-      <div class="flex flex-col">
+      <!-- <div class="flex flex-col">
         <label for="date" class="text-sm font-medium text-gray-700">Date</label>
         <div class="mt-1 py-2 px-3 bg-gray-100 rounded-md text-gray-700">
           {{ form.date }}
         </div>
-      </div>
+      </div> -->
 
       <!-- Title Input -->
       <BaseInput
@@ -27,13 +27,11 @@
         id="mood" />
 
       <!-- Mood Rating -->
-      <BaseRating
+      <!-- <BaseRating
         v-model="form.moodRating"
         label="Rate your overall mood"
         :max="10" />
-
-      <!-- Energy Level Rating -->
-      <BaseRating v-model="form.energyLevel" label="Energy Level" :max="10" />
+      <BaseRating v-model="form.energyLevel" label="Energy Level" :max="10" /> -->
 
       <!-- Voice Input Section -->
       <div class="flex flex-col">
