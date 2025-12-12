@@ -1,7 +1,5 @@
 <template>
   <div class="max-w-2xl mx-auto p-6">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">Daily Journal Entry</h1>
-
     <div class="space-y-6">
       <!-- Date Input -->
       <div class="flex flex-col">
@@ -132,6 +130,9 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useJournalEntries } from '#imports'
+
+const { createEntry, loading: apiLoading, error: apiError } = useJournalEntries()
 
 // Form Data
 const form = ref({
@@ -325,23 +326,37 @@ const stopSpeechRecognition = () => {
   stopAudioVisualization()
 }
 
-// Form Actions
 const handleSubmit = async () => {
+  // Validate required fields
+  if (!form.value.title || !form.value.content) {
+    alert('Please fill in both title and content before saving.')
+    return
+  }
+
   isSubmitting.value = true
 
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    console.log('Journal entry saved:', form.value)
-    successMessage.value = 'Journal entry saved successfully! ✨'
+    // Call the API to create the entry
+    const result = await createEntry({
+      title: form.value.title,
+      content: form.value.content,
+      status: 'published',
+    })
 
-    setTimeout(() => {
-      handleReset()
-    }, 2000)
+    if (result.success) {
+      console.log('Journal entry saved:', result.data)
+      successMessage.value = 'Journal entry saved successfully! ✨'
+
+      // Reset form after 2 seconds
+      setTimeout(() => {
+        handleReset()
+      }, 2000)
+    } else {
+      throw new Error(result.error || 'Failed to save entry')
+    }
   } catch (err) {
     console.error('Failed to save entry:', err)
-    alert('Failed to save entry. Please try again.')
+    alert(`Failed to save entry: ${err.message}. Please try again.`)
   } finally {
     isSubmitting.value = false
   }
