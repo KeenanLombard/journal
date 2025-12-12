@@ -1,6 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto p-6 container">
-
+  <div class="mx-auto p-6 container">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -86,9 +85,9 @@
               </h2>
               <span 
                 class="px-2 py-1 text-xs font-medium rounded-full shrink-0 ml-2"
-                :class="getStatusColor(entry.status)"
+                :class="getMoodColor(entry.mood)"
               >
-                {{ entry.status }}
+                {{ entry.mood }}
               </span>
             </div>
             
@@ -148,9 +147,9 @@
                 </h2>
                 <span 
                   class="px-2 py-1 text-xs font-medium rounded-full shrink-0"
-                  :class="getStatusColor(entry.status)"
+                  :class="getMoodColor(entry.mood)"
                 >
-                  {{ entry.status }}
+                  {{ entry.mood }}
                 </span>
               </div>
               
@@ -315,14 +314,18 @@ const getWordCount = (content) => {
 }
 
 // Get status color
-const getStatusColor = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'published':
+const getMoodColor = (mood) => {
+  switch (mood?.toLowerCase()) {
+    case 'happy':
       return 'bg-green-100 text-green-700'
-    case 'draft':
-      return 'bg-gray-100 text-gray-700'
-    case 'archived':
-      return 'bg-yellow-100 text-yellow-700'
+    case 'calm':
+      return 'bg-blue-100 text-blue-700'
+    case 'exited':
+          return 'bg-purple-100 text-purple-700'
+    case 'tired':
+          return 'bg-yellow-100 text-yellow-700'
+    case 'angry':
+      return 'bg-red-100 text-red-700'
     default:
       return 'bg-gray-100 text-gray-700'
   }

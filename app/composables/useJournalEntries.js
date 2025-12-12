@@ -7,8 +7,61 @@ export function useJournalEntries() {
 
   // Adjust this base URL to match your backend API
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8055'
-  const COLLECTION_NAME = 'journal_entries' // Adjust to your collection name
+    const COLLECTION_NAME = 'journal_entries' // Adjust to your collection name
+    
+const getMoodCounts = async () => {
+  loading.value = true
+  error.value = null
+  const moodCounts = {}
 
+  try {
+    const url = `${API_BASE_URL}/items/${COLLECTION_NAME}?aggregate[count]=mood&groupBy[]=mood`
+    console.log('Fetching mood counts →', url)
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}))
+      throw new Error(err.errors?.[0]?.message || `HTTP ${response.status}`)
+    }
+
+    const result = await response.json()
+    console.log('Raw response:', result)
+
+    const items = result.data || []
+
+    items.forEach(item => {
+      const mood = item.mood?.trim() || '(no mood)'
+      
+      // NEW FORMAT (Directus 10.8+): count is { mood: 5 }
+      // OLD FORMAT: count is "5" or 5
+      let count = 0
+      if (item.count !== undefined) {
+        if (typeof item.count === 'object' && item.count !== null) {
+          count = item.count.mood ?? 0
+        } else {
+          count = parseInt(item.count, 10) || 0
+        }
+      }
+
+      console.log(`Mood: "${mood}" → ${count} entries`)
+      moodCounts[mood] = count
+    })
+
+    console.log('Final mood counts →', moodCounts)
+    return moodCounts
+
+  } catch (err) {
+    console.error('getMoodCounts error:', err)
+    error.value = err.message
+    return moodCounts
+  } finally {
+    loading.value = false
+  }
+}
   /**
    * Create a new journal entry
    * @param {Object} entryData - The journal entry data
@@ -30,7 +83,8 @@ export function useJournalEntries() {
         },
         body: JSON.stringify({
           title: entryData.title,
-          content: entryData.content
+            content: entryData.content,
+          mood: entryData.mood
         })
       })
 
@@ -137,7 +191,8 @@ export function useJournalEntries() {
         },
         body: JSON.stringify({
           title: entryData.title,
-          content: entryData.content
+            content: entryData.content,
+            mood: entryData.mood
         })
       })
 
@@ -236,6 +291,7 @@ const getTodayJournalCount = async () => {
     getEntry,
     updateEntry,
     deleteEntry, 
-    getTodayJournalCount
+    getTodayJournalCount,
+    getMoodCounts
   }
 }

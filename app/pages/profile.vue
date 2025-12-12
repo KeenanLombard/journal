@@ -1,7 +1,7 @@
 <!-- pages/profile.vue -->
 <template>
   <div class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto">
+    <div class="container mx-auto">
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
@@ -105,6 +105,7 @@
           </div>
         </div>
       </div>
+      <ChartProfile :mood-counts="mood_counts" />
     </div>
   </div>
 </template>
@@ -112,6 +113,12 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useDirectusAuth } from '~/composables/useDirectusAuth'
+
+import { useJournalEntries } from '#imports'
+
+const { getMoodCounts } = useJournalEntries()
+const mood_counts = ref({})
+
 
 const { getUser, isLoggedIn, logout: directusLogout, authenticatedFetch } = useDirectusAuth()
 
@@ -147,6 +154,7 @@ onMounted(async () => {
   }
 
   await loadUserProfile()
+  mood_counts.value = await getMoodCounts()
 })
 
 const loadUserProfile = async () => {
