@@ -39,8 +39,11 @@ watch(
           <!-- Logo / Brand -->
           <NuxtLink to="/" class="flex items-center space-x-3">
             <div
-              class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
-              S
+              class="w-8 h-8 flex items-center justify-center">
+                <img
+                  src="../assets/logo.png"
+                  alt="logo"
+                >
             </div>
             <span class="font-semibold text-xl text-gray-900">Seekers</span>
           </NuxtLink>

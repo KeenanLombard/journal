@@ -5,6 +5,11 @@
     <div
       class="w-full max-w-md bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl p-8 border border-gray-200"
     >
+      <img
+        src="../../assets/logo.png"
+        alt="logo"
+        class="w-1/2 p-10 mx-auto mb-4"
+      >
       <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center tracking-tight">
         Welcome Back
       </h1>
