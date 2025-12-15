@@ -1,59 +1,35 @@
 <template>
   <div class="min-h-screen bg-gray-50 text-gray-900">
-    <div class="max-w-7xl mx-auto p-4 md:p-6">
+    <div class="container mx-auto p-4 md:p-6">
       <!-- Header -->
-      <header class="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            <h1 class="text-2xl font-bold">Bible Reader</h1>
-          </div>
+      <header>
+        <ReaderToolbar
+          :translations="translations"
+          :selected-translation="selectedTranslation"
+          :font-size="fontSize"
+          :is-playing="isPlaying"
+          :reading-speed="readingSpeed"
+          :title="selectedTranslation"
 
-          <div class="flex flex-wrap items-center gap-3">
-            <!-- Translation Selector -->
-            <select v-model="selectedTranslation" @change="loadChapter"
-              class="rounded-lg border bg-white border-gray-300 px-3 py-2 focus:ring-2 focus:ring-indigo-500">
-              <option v-for="t in translations" :key="t" :value="t">{{ t }}</option>
-            </select>
-
-            <!-- Font Size Controls -->
-            <div class="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
-              <button @click="fontSize = Math.max(12, fontSize - 2)" class="p-2 hover:bg-gray-100 rounded">
-                <span class="text-sm font-bold">A−</span>
-              </button>
-              <span class="px-3 text-sm font-medium">{{ fontSize }}px</span>
-              <button @click="fontSize = Math.min(32, fontSize + 2)" class="p-2 hover:bg-gray-100 rounded">
-                <span class="text-lg font-bold">A+</span>
-              </button>
-            </div>
-
-            <!-- Audio Controls -->
-            <div class="flex items-center gap-2 border border-gray-300 rounded-lg p-2">
-              <button @click="isPlaying = !isPlaying" :title="isPlaying ? 'Pause' : 'Play'"
-                class="p-2 hover:bg-gray-100 rounded-lg transition">
-                <svg v-if="isPlaying" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6" />
-                </svg>
-                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </button>
-              <select v-model="readingSpeed" class="text-sm bg-transparent border-0 focus:ring-0">
-                <option value="0.75">0.75×</option>
-                <option value="1">1×</option>
-                <option value="1.25">1.25×</option>
-                <option value="1.5">1.5×</option>
-              </select>
-            </div>
-          </div>
-        </div>
+          @update:translation="val => { selectedTranslation = val; loadChapter() }"
+          @update:fontSize="val => fontSize = val"
+          @update:readingSpeed="val => readingSpeed = val"
+          @togglePlay="isPlaying = !isPlaying"
+        />
       </header>
 
+      <Section>
+        <ReaderGlobalSearch
+          :search-text="searchText"
+          :search-scope="searchScope"
+          :searching="searching"
+
+          @update:searchText="val => searchText = val"
+          @update:searchScope="val => searchScope = val"
+          @search="doSearch"
+          @clear="clearSearch"
+        />
+      </Section>
       <!-- Error Alert -->
       <div v-if="error" class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg mb-6">
         <p class="font-medium">Warning: {{ error }}</p>
@@ -123,39 +99,6 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
-            </div>
-          </div>
-
-          <!-- Search Bar -->
-          <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div class="flex gap-3 mb-3">
-              <div class="flex-1 relative">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input v-model="searchText" @keyup.enter="doSearch" type="text" placeholder="Search scripture..."
-                  class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 bg-white focus:ring-2 focus:ring-indigo-500" />
-              </div>
-              <button @click="doSearch" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                Search
-              </button>
-              <button v-if="searching" @click="clearSearch"
-                class="p-2.5 rounded-lg border border-gray-300 hover:bg-gray-100">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div class="flex gap-6 text-sm">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" v-model="searchScope" value="book" class="text-indigo-600" />
-                <span>Current book only</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="radio" v-model="searchScope" value="global" class="text-indigo-600" />
-                <span>Entire Bible</span>
-              </label>
             </div>
           </div>
 
@@ -326,7 +269,7 @@ const fetchJSON = async (path) => {
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return await res.json()
 }
-
+   
 const loadBooks = async () => {
   loading.value = true
   try {
